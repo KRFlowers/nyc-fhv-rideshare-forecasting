@@ -13,6 +13,15 @@ This project builds forecasting models to predict rideshare demand across NYC's 
 - Compare service patterns across Uber, Lyft, and Via
 - Seasonal pattern analysis (STL decomposition)
 
+## Pipeline Overview
+
+This project implements a 4-stage data pipeline for NYC rideshare demand forecasting:
+
+1. **Stage 0 - Data Download**: Retrieves and consolidates 36 monthly files (684M records)
+2. **Stage 1 - Data Validation**: Implements quality checks, produces clean dataset (99.91% valid)
+3. **Stage 2 - Exploratory Analysis**: [to be completed]
+4. **Stage 3 - Modeling**: [to be completed]
+
 ### Dataset
 
 - **Source:** NYC Taxi & Limousine Commission (TLC)
@@ -44,13 +53,14 @@ nyc-hvfhv-rideshare-analysis/
 └── .gitignore
 ```
 
-### Pipeline Stages
+## Pipeline Overview
 
-0. Data Download 
-1. Data Validation 
-2. Exploratory Analysis 
-3. Demand Forecasting 
-4. Trip Prediction 
+This project implements a 4-stage data pipeline for NYC rideshare demand forecasting:
+
+1. **Stage 0 - Data Download**: Retrieves and consolidates 36 monthly files (684M records)
+2. **Stage 1 - Data Validation**: Implements quality checks, produces clean dataset (99.91% valid)
+3. **Stage 2 - Exploratory Analysis**: [to be completed]
+4. **Stage 3 - Modeling**: [to be completed]
 
 ## Getting Started
 
