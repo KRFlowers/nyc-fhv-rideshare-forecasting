@@ -1,18 +1,14 @@
 # NYC Rideshare Demand Forecasting — Time Series Analysis
 
-This project predicts daily rideshare pickup demand across 100 NYC taxi zones using three years of Uber/Lyft trip data (684M records). The pipeline consists of four notebooks: data download, data validation, exploratory analysis, and demand forecasting. Three time series approaches were evaluated: Seasonal Naive (baseline), Prophet, and XGBoost. The goal was to identify the best model for operational planning.
-
-## Key Results
+This project forecasts daily Uber/Lyft demand for NYC using 684M trip records from 2022-2024. The analysis focuses on the top 100 highest-volume zones, which capture 72% of total citywide demand. Three time series approaches were evaluated—Seasonal Naive, Prophet, and XGBoost. Results can be used to support more efficient driver allocation and improved service coverage.
 
 **Model Performance:**
-- Best model (XGBoost) achieved 6.5% mean MAPE across 100 zones
-- XGBoost showed 35% improvement over seasonal naive baseline
+- XGBoost achieved 6.5% MAPE with 35% improvement over seasonal naive baseline
 
 **Data Discoveries:**
+- Demand follows a consistent weekly pattern with weekends averaging 17% higher than weekdays. This pattern enabled lag-based forecasting.
+- Within-zone demand was very stable (CV < 0.3), enabling reliable forecasts with simple lag features
 - Data quality was high with 99.91% of records passed validation
-- Within-zone demand was very stable (CV < 0.3 across all zones)
-- These characteristics influenced model selection: stable patterns favored simple lag features over complex seasonality modeling
-- Demand was more evenly distributed than expected. Top 30 zones captured only 32% of trips, far below a typical Pareto pattern. This likely reflects how zones are designed around neighborhoods, with more zones in dense areas like Manhattan. It meant 100 zones were needed for adequate coverage.
 
 ## Business Problem
 
@@ -20,10 +16,10 @@ Accurate demand forecasts are important because they create value for both drive
 
 ## Key Findings
 
-- Weekend demand is 17% higher than weekdays — weekly seasonality is the dominant pattern
-- Low within-zone variability was discovered (CV < 0.3), which influenced model performance — simpler lag-based approaches outperformed flexible seasonality models like Prophet
-- 76% of zone pairs show medium-to-high correlation, which suggested one model could work across zones
-- Strong growth identified in 2022 but stable in 2023-2024, which may reflect post-COVID recovery
+- Weekend demand is 17% higher than weekdays and weekly seasonality is the dominant pattern
+- Low within-zone variability was discovered (CV < 0.3) and influenced model performance (simpler lag-based approaches outperformed flexible seasonality models like Prophet)
+- 76% of zone pairs show medium-to-high correlation, which suggested one model could work across all zones
+- Strong growth identified in 2022 but stable in 2023-2024. This may reflect post-COVID recovery
 
 ## Data
 
@@ -58,7 +54,7 @@ Accurate demand forecasts are important because they create value for both drive
 **Prerequisites:** Python 3.10+, ~40GB disk space
 
 ```bash
-git clone https://github.com/[your-username]/nyc-rideshare-forecasting.git
+git clone https://github.com/KRFlowers/nyc-rideshare-forecasting.git
 cd nyc-rideshare-forecasting
 pip install -r requirements.txt
 ```
@@ -82,3 +78,4 @@ Total runtime: ~4-5 hours first run, ~45 minutes if data exists
 ## Author
 
 Kristi Flowers
+  - kristirflowers@gmail.com
