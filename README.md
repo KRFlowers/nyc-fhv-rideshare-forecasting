@@ -1,25 +1,31 @@
 # NYC Rideshare Demand Forecasting — Time Series Analysis
 
-This project forecasts daily Uber/Lyft demand for NYC using 684M trip records from 2022-2024. The analysis focuses on the top 100 highest-volume zones, which capture 72% of total citywide demand. Three time series approaches were evaluated—Seasonal Naive, Prophet, and XGBoost. Results can be used to support more efficient driver allocation and improved service coverage.
+This project forecasts daily Uber/Lyft demand for NYC using 684M trip records from 2022-2024. Three time series approaches were evaluated—Seasonal Naive, Prophet, and XGBoost. The analysis produces daily demand forecasts by NYC zone.
+
+## Project Overview
+
+**The Problem:** Gig workers face a critical problem: **committing their availability without guaranteed earnings**. Currently, **28 million Americans** work in the rideshare and delivery industries (Flex, 2024), with workers in warehouse and logistics facing the same demand uncertainty. When companies schedule workers based on inaccurate demand forecasts, workers bear the cost:**uncertain income and missed opportunities** to work elsewhere.
+
+**Better demand forecasting enables more accurate scheduling decisions**, reducing income uncertainty for workers while improving operational efficiency for companies.
+
+**The Approach:** This project analyzes 684M FHVHV trip records from NYC spanning 2022-2024. Three forecasting approaches were evaluated: Seasonal Naive (baseline), Prophet (automated seasonality), and XGBoost (lag-based features).
+
+**The Result:** XGBoost achieved 6.5% MAPE with 35% improvement over the seasonal naive baseline.
+
+## Key Results
 
 **Model Performance:**
-- XGBoost achieved 6.5% MAPE with 35% improvement over seasonal naive baseline
+- **XGBoost** — 6.5% MAPE (best performance, 35% improvement over baseline)
+- **Seasonal Naive** — 9.9% MAPE (baseline)
+- **Prophet** — 11.1% MAPE (underperformed baseline)
 
-**Data Discoveries:**
-- Demand follows a consistent weekly pattern with weekends averaging 17% higher than weekdays. This pattern enabled lag-based forecasting.
-- Within-zone demand was very stable (CV < 0.3), enabling reliable forecasts with simple lag features
-- Data quality was high with 99.91% of records passed validation
-
-## Business Problem
-
-Accurate demand forecasts are important because they create value for both drivers and companies. Optimized scheduling ensures drivers' time is used effectively, while companies can position supply where needed. This project develops zone-level daily forecasts to support both of these goals.
-
-## Key Findings
-
-- Weekend demand is 17% higher than weekdays and weekly seasonality is the dominant pattern
-- Low within-zone variability was discovered (CV < 0.3) and influenced model performance (simpler lag-based approaches outperformed flexible seasonality models like Prophet)
-- 76% of zone pairs show medium-to-high correlation, which suggested one model could work across all zones
-- Strong growth identified in 2022 but stable in 2023-2024. This may reflect post-COVID recovery
+**Data Insights:**
+- Weekend demand averaged 17% higher than weekdays
+- Weekly seasonality was the dominant pattern with a slight yearly seasonal component
+- Low within-zone variability (CV < 0.3) allowed simple 7-day lag features to capture demand patterns effectively
+- 76% of zone pairs showed medium-to-high correlation, indicating a single model approach across all zones may be sufficient
+- Strong growth in 2022 that stabilized in 2023-2024 may reflect post-COVID recovery patterns
+- Data quality was very high with 99.91% of records passing validation
 
 ## Data
 
@@ -31,23 +37,27 @@ Accurate demand forecasts are important because they create value for both drive
 
 ## Pipeline
 
-1. **00_data_download.ipynb** — Download and consolidate monthly Parquet files (~2-3 hrs)
-2. **01_data_validation.ipynb** — Quality checks, flagging, clean dataset creation (~30 min)
-3. **02_exploratory_analysis.ipynb** — Demand patterns, zone selection, feature engineering (~20 min)
-4. **03_demand_forecasting.ipynb** — Model comparison and zone-level forecasts (~15 min)
-
-## Models Evaluated
-
-- **XGBoost** — Lag features (7-day), MAE: 302 trips/day, 6.5% MAPE, **best performance**
-- **Seasonal Naive** — Same day last week, MAE: 466 trips/day (baseline)
-- **Prophet** — Automated seasonality, MAE: 521 trips/day, underperformed baseline
+1. **00_data_download.ipynb** — Download and combine monthly Parquet files (~2-3 hrs)
+2. **01_data_validation.ipynb** — Validate data quality, flag issues, create a clean dataset (~30 min)
+3. **02_exploratory_analysis.ipynb** — Analyze demand patterns, select zones, engineer features (~20 min)
+4. **03_demand_forecasting.ipynb** — Compare models and generate zone-level forecasts (~15 min)
 
 ## Tech Stack
 
-- **Data Processing:** DuckDB (memory-efficient processing of 684M records)
+- **Data Processing:** DuckDB (enables memory-efficient processing of 18GB dataset)
 - **Analysis:** pandas, NumPy, SciPy
 - **Modeling:** XGBoost, Prophet, scikit-learn
 - **Visualization:** Matplotlib, Seaborn
+
+## Limitations
+
+This analysis focuses on the top 100 highest-demand zones to keep the project manageable while still capturing 72% of total citywide demand. Lower-demand zones were not modeled but could be included in future iterations. External factors like weather and events were not incorporated at this stage.
+
+## Future Work
+
+- Hyperparameter tuning for XGBoost
+- Add weather and event data
+- Expand beyond top 100 zones
 
 ## How to Run
 
@@ -59,23 +69,15 @@ cd nyc-rideshare-forecasting
 pip install -r requirements.txt
 ```
 
-Run notebooks in sequence: 00 → 01 → 02 → 03
+Run notebooks in sequence: 00 > 01 > 02 > 03
 
-Total runtime: ~4-5 hours first run, ~45 minutes if data exists
+**Total runtime:** ~1-2 hours first run, ~30 minutes if data exists
 
-## Limitations
+## References
 
-- No external factors (weather, events) included yet
-- Top 100 zones only — lower-demand areas not modeled
-- 2022-2024 reflects post-COVID patterns
-
-## Future Work
-
-- Hyperparameter tuning for XGBoost
-- Add weather and event data
-- Expand beyond top 100 zones
+Flex. (2024). *Platform Work in America Report*. Flex Association. https://www.flexassociation.org/
 
 ## Author
 
-Kristi Flowers
-  - kristirflowers@gmail.com
+**Kristi Flowers**  
+kristirflowers@gmail.com
