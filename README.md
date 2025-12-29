@@ -8,7 +8,7 @@ This project forecasts daily Uber/Lyft demand for NYC using 684M trip records fr
 
 **Better demand forecasting enables more accurate scheduling decisions**, reducing income uncertainty for workers while improving operational efficiency for companies.
 
-**The Approach:** This project analyzes 684M FHVHV trip records from NYC spanning 2022-2024. Three forecasting approaches were evaluated: Seasonal Naive (baseline), Prophet (automated seasonality), and XGBoost (lag-based features).
+**The Approach:** This project analyzes 684M FHVHV trip records from NYC spanning 2022-2024. Three forecasting approaches were evaluated: Seasonal Naive (baseline), Prophet (automated seasonality), and XGBoost (lag-based features). This analysis is limited to 1-day-ahead forecasting, with longer operational horizons (7-14 days) to be explored in future iterations.
 
 **The Result:** XGBoost achieved 6.5% MAPE with 35% improvement over the seasonal naive baseline.
 
@@ -18,6 +18,8 @@ This project forecasts daily Uber/Lyft demand for NYC using 684M trip records fr
 - **XGBoost** — 6.5% MAPE (best performance, 35% improvement over baseline)
 - **Seasonal Naive** — 9.9% MAPE (baseline)
 - **Prophet** — 11.1% MAPE (underperformed baseline)
+
+*Note:  Forecast errors under 10% are generally considered acceptable for demand planning. Model performance is for 1-Day-Ahead Forecasts.*
 
 **Data Insights:**
 - Weekend demand averaged 17% higher than weekdays
@@ -51,13 +53,16 @@ This project forecasts daily Uber/Lyft demand for NYC using 684M trip records fr
 
 ## Limitations
 
-This analysis focuses on the top 100 highest-demand zones to keep the project manageable while still capturing 72% of total citywide demand. Lower-demand zones were not modeled but could be included in future iterations. External factors like weather and events were not incorporated at this stage.
+This project analyzes 1-day-ahead predictions and serves as a proof of concept rather than production-grade analysis. Real-world scheduling applications would require 7-14 day forecast horizons to be operationally useful. This was a key lesson learned in demand forecasting, and extending to longer horizons is planned for future iterations.
+
+Analysis was also limited to the top 100 highest-demand zones to keep the project computationally manageable while still capturing 72% of total citywide demand. Lower-demand zones were not modeled but could be included in future iterations. External factors like weather and events were not incorporated at this stage.
 
 ## Future Work
 
-- Hyperparameter tuning for XGBoost
-- Add weather and event data
-- Expand beyond top 100 zones
+- Extend to multi-day predictions (7-day, 14-day) to better reflect real-world operational forcasting requirements.
+- Add hyperparameter tuning for XGBoost
+- Add weather data and event calendar
+- Expand beyond top 100 zones to include all ride-share demand
 
 ## How to Run
 
