@@ -1,6 +1,6 @@
 # NYC Rideshare Demand Forecasting
 
-This project uses publicly available New York City Taxi & Limousine Commission For-Hire Vehicle High Volume (FHVHV) trip data to perform time series forecasting on daily demand. The analysis is based on 684 million trip records from 2022 through 2024 and focuses on short-term demand patterns at scale. Three models are evaluated: a Seasonal Naive baseline, Prophet, and XGBoost.
+This project uses publicly available New York City Taxi & Limousine Commission For-Hire Vehicle High Volume (FHVHV) trip data to perform time series forecasting on daily demand. The analysis is based on 684 million trip records from 2022 through 2024 and focuses on short-term demand forecasting. Three models are evaluated: a Seasonal Naive baseline, Prophet, and XGBoost.
 
 ## Business Context
 
