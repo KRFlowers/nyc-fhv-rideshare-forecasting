@@ -1,33 +1,61 @@
-# NYC Rideshare Demand Forecasting — Time Series Analysis
+# NYC Rideshare Demand Forecasting
 
-This project forecasts daily Uber/Lyft demand for NYC using 684M trip records from 2022-2024. Three time series approaches were evaluated—Seasonal Naive, Prophet, and XGBoost. The analysis produces daily demand forecasts by NYC zone.
+This project uses publicly available New York City Taxi & Limousine Commission For-Hire Vehicle High Volume (FHVHV) trip data to perform time series forecasting on daily demand. The analysis is based on 684 million trip records from 2022 through 2024 and focuses on short-term demand patterns at scale. Three models are evaluated: a Seasonal Naive baseline, Prophet, and XGBoost.
 
-## Project Overview
+## Business Context
 
-**The Problem:** Gig workers face a critical problem: **committing their availability without guaranteed earnings**. Currently, **28 million Americans** work in the rideshare and delivery industries (Flex, 2024), with workers in warehouse and logistics facing the same demand uncertainty. When companies schedule workers based on inaccurate demand forecasts, workers bear the cost:**uncertain income and missed opportunities** to work elsewhere.
+Demand forecasting is a core part of business operations planning. Accurate forecasts help companies align staffing and resources with expected demand.
 
-**Better demand forecasting enables more accurate scheduling decisions**, reducing income uncertainty for workers while improving operational efficiency for companies.
+What may be less obvious is that forecasting accuracy also affects workers. In demand-driven roles (such as rideshare drivers and warehouse staff), more reliable forecasts help reduce schedule uncertainty and allow them to plan their time more effectively.
 
-**The Approach:** This project analyzes 684M FHVHV trip records from NYC spanning 2022-2024. Three forecasting approaches were evaluated: Seasonal Naive (baseline), Prophet (automated seasonality), and XGBoost (lag-based features). This analysis is limited to 1-day-ahead forecasting, with longer operational horizons (7-14 days) to be explored in future iterations.
+## Approach
 
-**The Result:** XGBoost achieved 6.5% MAPE with 35% improvement over the seasonal naive baseline.
+The project is organized as a notebook-based pipeline, with each step building toward scalable demand forecasting.
 
-## Key Results
+- **00_data_download**  
+  Downloaded and combined monthly FHVHV files into a single Parquet dataset using DuckDB for memory-efficient processing.
 
-**Model Performance:**
-- **XGBoost** — 6.5% MAPE (best performance, 35% improvement over baseline)
-- **Seasonal Naive** — 9.9% MAPE (baseline)
-- **Prophet** — 11.1% MAPE (underperformed baseline)
+- **01_data_validation**  
+  Validated trip records, checked for missing or invalid values, and aggregated data to daily demand by zone.
 
-*Note:  Forecast errors under 10% are generally considered acceptable for demand planning. Model performance is for 1-Day-Ahead Forecasts.*
+- **02_exploratory_analysis**  
+  Examined demand characteristics globally and by zone, including seasonality, stability, and correlation with citywide patterns.
 
-**Data Insights:**
-- Weekend demand averaged 17% higher than weekdays
-- Weekly seasonality was the dominant pattern with a slight yearly seasonal component
-- Low within-zone variability (CV < 0.3) allowed simple 7-day lag features to capture demand patterns effectively
-- 76% of zone pairs showed medium-to-high correlation, indicating a single model approach across all zones may be sufficient
-- Strong growth in 2022 that stabilized in 2023-2024 may reflect post-COVID recovery patterns
-- Data quality was very high with 99.91% of records passing validation
+- **03_demand_forecasting**  
+  Evaluated a pilot zone using three models (Seasonal Naive, Prophet, and XGBoost), selected the best-performing model, and scaled it across eligible zones.
+
+## Results
+
+Model performance was evaluated using mean absolute percentage error (MAPE), with an emphasis on short-horizon accuracy and scalability.
+
+- **Pilot zone performance**
+  - XGBoost achieved the lowest error and was selected for scaling.
+  - Seasonal Naive provided a strong baseline for comparison.
+  - Prophet underperformed for one-day-ahead forecasts.
+
+- **Scaled results**
+  - XGBoost achieved an average **6.4% MAPE** across 195 zones.
+  - **97% of zones** met the <10% MAPE target.
+  - High-correlation zones represented **82% of total trips**, supporting the scalability of a shared modeling approach.
+
+- **Key demand patterns**
+  - Weekly seasonality dominated demand behavior.
+  - Weekend demand averaged higher than weekdays.
+  - Demand was stable within zones, supporting additive modeling assumptions.
+
+## Limitations
+
+- One-day-ahead only — keeps initial analysis straightforward; 1-2 week horizons typical of driver scheduling are a natural next step
+- Prophet may be worth re-evaluating for longer forecast horizons
+- 61 low-correlation zones (airports, entertainment districts) excluded — may need specialized models
+- External factors (weather, events) not incorporated
+
+## Next Steps
+
+- Extend to multi-day forecast horizons (7-14 days)
+- Add cross-validation and hyperparameter tuning
+- Incorporate statistical testing for model comparison
+- Develop specialized models for low-correlation zones
 
 ## Data
 
@@ -35,54 +63,25 @@ This project forecasts daily Uber/Lyft demand for NYC using 684M trip records fr
 - **Dataset:** For-Hire Vehicle High Volume (FHVHV) trip records
 - **Period:** January 2022 – December 2024 (36 months)
 - **Scale:** 684 million trip records
-- **Scope:** Top 100 zones capturing ~72% of total demand
+- **Scope:** 195 high-correlation zones (82% of total demand)
 
-## Pipeline
+## Notebook Pipeline
 
-1. **00_data_download.ipynb** — Download and combine monthly Parquet files (~2-3 hrs)
-2. **01_data_validation.ipynb** — Validate data quality, flag issues, create a clean dataset (~30 min)
-3. **02_exploratory_analysis.ipynb** — Analyze demand patterns, select zones, engineer features (~20 min)
-4. **03_demand_forecasting.ipynb** — Compare models and generate zone-level forecasts (~15 min)
+| Notebook | Purpose | Runtime |
+|----------|---------|---------|
+| **00_data_download** | Download and combine monthly Parquet files | ~1 hour |
+| **01_data_validation** | Validate data quality, flag issues | ~30 min |
+| **02_exploratory_analysis** | Aggregate to daily, analyze patterns | ~15 min |
+| **03_demand_forecasting** | Compare models, generate forecasts | ~15 min |
 
 ## Tech Stack
 
-- **Data Processing:** DuckDB (enables memory-efficient processing of 18GB dataset)
-- **Analysis:** pandas, NumPy, SciPy
+- **Data Processing:** DuckDB (memory-efficient processing of 18GB dataset)
+- **Analysis:** pandas, NumPy
 - **Modeling:** XGBoost, Prophet, scikit-learn
-- **Visualization:** Matplotlib, Seaborn
-
-## Limitations
-
-This project analyzes 1-day-ahead predictions and serves as a proof of concept rather than production-grade analysis. Real-world scheduling applications would require 7-14 day forecast horizons to be operationally useful. This was a key lesson learned in demand forecasting, and extending to longer horizons is planned for future iterations.
-
-Analysis was also limited to the top 100 highest-demand zones to keep the project computationally manageable while still capturing 72% of total citywide demand. Lower-demand zones were not modeled but could be included in future iterations. External factors like weather and events were not incorporated at this stage.
-
-## Future Work
-
-- Extend to multi-day predictions (7-day, 14-day) to better reflect real-world operational forcasting requirements.
-- Add hyperparameter tuning for XGBoost
-- Add weather data and event calendar
-- Expand beyond top 100 zones to include all ride-share demand
-
-## How to Run
-
-**Prerequisites:** Python 3.10+, ~40GB disk space
-
-```bash
-git clone https://github.com/KRFlowers/nyc-rideshare-forecasting.git
-cd nyc-rideshare-forecasting
-pip install -r requirements.txt
-```
-
-Run notebooks in sequence: 00 > 01 > 02 > 03
-
-**Total runtime:** ~1-2 hours first run, ~30 minutes if data exists
-
-## References
-
-Flex. (2024). *Platform Work in America Report*. Flex Association. https://www.flexassociation.org/
+- **Visualization:** Matplotlib
 
 ## Author
 
-**Kristi Flowers**  
-kristirflowers@gmail.com
+**K Flowers**
+GitHub: [KRFlowers](https://github.com/KRFlowers)
