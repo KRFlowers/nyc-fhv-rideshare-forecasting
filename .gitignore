@@ -1,5 +1,5 @@
 # Project-specific excludes
-docs/                    # notes
+notes/
 
 # Data files (DON'T COMMIT 18GB DATASETS!)
 data/raw/*

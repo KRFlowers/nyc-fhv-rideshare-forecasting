@@ -1,87 +1,104 @@
 # NYC Rideshare Demand Forecasting
 
-This project uses publicly available New York City Taxi & Limousine Commission For-Hire Vehicle High Volume (FHVHV) trip data to perform time series forecasting on daily demand. The analysis is based on 684 million trip records from 2022 through 2024 and focuses on short-term demand forecasting. Three models are evaluated: a Seasonal Naive baseline, Prophet, and XGBoost.
+This project uses publicly available data to forecast daily NYC rideshare demand. Using 684 million trip records from 2022–2024, I built and evaluated short-horizon forecasting models across taxi zones. Rather than forcing a single model across all zones, the analysis focused on identifying a subset of high-correlation zones where a shared modeling approach achieved strong and consistent performance. The project emphasizes predictive accuracy and scalable modeling across structurally similar demand patterns.
+
+---
 
 ## Business Context
 
-Demand forecasting is a core part of business operations planning. Accurate forecasts help companies align staffing and resources with expected demand.
+Demand forecasting is a core component of operations planning. Accurate forecasts help companies align staffing and resources with expected demand. In demand-driven environments such as rideshare platforms, reliable short-term forecasts can also reduce uncertainty for drivers and operators. Effective forecasting supports both operational efficiency and workforce stability.
 
-What may be less obvious is that forecasting accuracy also affects workers. In demand-driven roles (such as rideshare drivers and warehouse staff), more reliable forecasts help reduce schedule uncertainty and allow them to plan their time more effectively.
+
+---
 
 ## Approach
 
-The project is organized as a notebook-based pipeline, with each step building toward scalable demand forecasting.
+The project is organized as a notebook-based pipeline.
 
-- **00_data_download**  
-  Downloaded and combined monthly FHVHV files into a single Parquet dataset using DuckDB for memory-efficient processing.
+- **00_data_download.ipynb**  
+  Downloaded and consolidated monthly FHVHV files into a unified Parquet dataset using DuckDB for memory-efficient processing.
 
-- **01_data_validation**  
-  Validated trip records, checked for missing or invalid values, and aggregated data to daily demand by zone.
+- **01_data_validation.ipynb**  
+  Validated trip records against duration, distance, and fare thresholds. Flagged invalid records and exported a clean dataset for analysis.
 
-- **02_exploratory_analysis**  
-  Examined demand characteristics globally and by zone, including seasonality, stability, and correlation with citywide patterns.
+- **02_exploratory_analysis.ipynb**  
+  Examined seasonality, trend stability, and cross-zone correlation patterns.
 
-- **03_demand_forecasting**  
-  Evaluated a pilot zone using three models (Seasonal Naive, Prophet, and XGBoost), selected the best-performing model, and scaled it across eligible zones.
+- **03_demand_forecasting.ipynb**
+  Compared Seasonal Naive, Prophet, and XGBoost models. Selected the best-performing approach and scaled forecasts across eligible zones.
+
+- **Streamlit Dashboard** — Interactive Streamlit dashboard for demand and analysis review (see [below]
+
+---
 
 ## Results
 
-Model performance was evaluated using mean absolute percentage error (MAPE), with an emphasis on short-horizon accuracy and scalability.
+Model performance was evaluated using mean absolute percentage error (MAPE) for one-day-ahead forecasts.
 
-- **Pilot zone performance**
-  - XGBoost achieved the lowest error and was selected for scaling.
-  - Seasonal Naive provided a strong baseline for comparison.
-  - Prophet underperformed for one-day-ahead forecasts.
+### Model Performance
 
-- **Scaled results**
-  - XGBoost achieved an average **6.4% MAPE** across 195 zones.
-  - **97% of zones** met the <10% MAPE target.
-  - High-correlation zones represented **82% of total trips**, supporting the scalability of a shared modeling approach.
+- **XGBoost achieved an average 6.4% MAPE across 195 zones**
+- 97% of zones met the <10% MAPE performance target
+- Seasonal Naive provided a strong baseline
+- Prophet underperformed for short-horizon forecasting
 
-- **Key demand patterns**
-  - Weekly seasonality dominated demand behavior.
-  - Weekend demand averaged higher than weekdays.
-  - Demand was stable within zones, supporting additive modeling assumptions.
+### Demand Patterns
 
-## Limitations
+- Weekly seasonality was the dominant demand signal
+- Weekend demand averaged higher than weekdays
+- High-correlation zones accounted for 82% of total trip volume, supporting a shared modeling approach
 
-- One-day-ahead only — keeps initial analysis straightforward; 1-2 week horizons typical of driver scheduling are a natural next step
-- Prophet may be worth re-evaluating for longer forecast horizons
-- 61 low-correlation zones (airports, entertainment districts) excluded — may need specialized models
-- External factors (weather, events) not incorporated
+---
+
+## Streamlit Dashboard
+
+The project includes an interactive Streamlit dashboard .
+
+![Operations Dashboard](images/dashboard_screenshot.png)
+
+Run locally:
+
+    streamlit run app/dashboard.py
+
+---
+
+## Analysis Limitations
+
+- Forecast horizon limited to one-day-ahead predictions
+- External variables (weather, events, policy changes) were not incorporated
+- Low-correlation zones (e.g., airports, entertainment districts) were excluded from modeling
+
+---
 
 ## Next Steps
 
-- Extend to multi-day forecast horizons (7-14 days)
-- Add cross-validation and hyperparameter tuning
-- Incorporate statistical testing for model comparison
-- Develop specialized models for low-correlation zones
+- Extend forecasting horizon to 7–14 days
+- Incorporate time-series cross-validation
+- Explore hyperparameter optimization
+- Integrate external demand drivers (weather, events)
+- Develop specialized models for structurally distinct zones
+
+---
 
 ## Data
 
-- **Source:** [NYC Taxi & Limousine Commission](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
+- **Source:** NYC Taxi & Limousine Commission
 - **Dataset:** For-Hire Vehicle High Volume (FHVHV) trip records
-- **Period:** January 2022 – December 2024 (36 months)
+- **Period:** January 2022 – December 2024
 - **Scale:** 684 million trip records
 - **Scope:** 195 high-correlation zones (82% of total demand)
 
-## Notebook Pipeline
-
-| Notebook | Purpose | Runtime |
-|----------|---------|---------|
-| **00_data_download** | Download and combine monthly Parquet files | ~1 hour |
-| **01_data_validation** | Validate data quality, flag issues | ~30 min |
-| **02_exploratory_analysis** | Aggregate to daily, analyze patterns | ~15 min |
-| **03_demand_forecasting** | Compare models, generate forecasts | ~15 min |
+---
 
 ## Tech Stack
 
-- **Data Processing:** DuckDB (memory-efficient processing of 18GB dataset)
-- **Analysis:** pandas, NumPy
-- **Modeling:** XGBoost, Prophet, scikit-learn
-- **Visualization:** Matplotlib
-
-## Author
+- DuckDB (large-scale data processing)
+- pandas, NumPy
+- XGBoost
+- Prophet
+- scikit-learn
+- Matplotlib
+- Streamlit, Plotly
 
 **K Flowers**
 GitHub: [KRFlowers](https://github.com/KRFlowers)
