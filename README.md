@@ -27,7 +27,7 @@ The project is organized as a notebook-based pipeline.
 - **03_demand_forecasting.ipynb**
   Compared Seasonal Naive, Prophet, and XGBoost models. Selected the best-performing approach and scaled forecasts across eligible zones.
 
-- **Streamlit Dashboard** — Interactive Streamlit dashboard for demand and analysis review (see [below]
+- **Streamlit Dashboard** — Interactive Streamlit dashboard for demand and analysis review (see [below](#streamlit-dashboard))
 
 ---
 
@@ -99,6 +99,14 @@ Run locally:
 - scikit-learn
 - Matplotlib
 - Streamlit, Plotly
+
+---
+
+## References
+
+- NYC Taxi & Limousine Commission. (n.d.). TLC Trip Record Data. https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+
+---
 
 **K Flowers**
 GitHub: [KRFlowers](https://github.com/KRFlowers)
