@@ -1,13 +1,10 @@
 # NYC Rideshare Demand Forecasting
 
-This project uses publicly available data to forecast daily NYC rideshare demand. Using 684 million trip records from 2022–2024, I built and evaluated short-horizon forecasting models across taxi zones. Rather than forcing a single model across all zones, the analysis focused on identifying a subset of high-correlation zones where a shared modeling approach achieved strong and consistent performance. The project emphasizes predictive accuracy and scalable modeling across structurally similar demand patterns.
+## Overview
 
----
+Effective forecasting is critical to business planning and particularly essential in industries with volatile demand such as rideshare. This variability in demand makes adequate staffing an ongoing operational challenge. Developing reliable forecasts enables operators to make more informed staffing decisions. The result is greater operational efficiency for the company and more predictable, better-utilized working hours for drivers.
 
-## Business Context
-
-Demand forecasting is a core component of operations planning. Accurate forecasts help companies align staffing and resources with expected demand. In demand-driven environments such as rideshare platforms, reliable short-term forecasts can also reduce uncertainty for drivers and operators. Effective forecasting supports both operational efficiency and workforce stability.
-
+To examine this in practice, this project forecasts rideshare demand across New York City's taxi zones using 684 million publicly available trip records from 2022–2024. Seasonal Naive, Prophet, and XGBoost models were evaluated across 195 high-volume zones representing 82% of total trip volume. XGBoost delivered the strongest performance, achieving an average MAPE of 6.4%, with 97% of zones below the 10% error target.
 
 ---
 
@@ -24,7 +21,7 @@ The project is organized as a notebook-based pipeline.
 - **02_exploratory_analysis.ipynb**  
   Examined seasonality, trend stability, and cross-zone correlation patterns.
 
-- **03_demand_forecasting.ipynb**
+- **03_demand_forecasting.ipynb**  
   Compared Seasonal Naive, Prophet, and XGBoost models. Selected the best-performing approach and scaled forecasts across eligible zones.
 
 - **Streamlit Dashboard** — Interactive Streamlit dashboard for demand and analysis review (see [below](#streamlit-dashboard))
@@ -52,9 +49,13 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 ## Streamlit Dashboard
 
-The project includes an interactive Streamlit dashboard .
+The project includes an interactive Streamlit dashboard for exploring demand patterns and forecast performance.
 
 ![Operations Dashboard](images/dashboard_screenshot.png)
+
+- **KPI Summary** — Total trips, average daily demand, peak day, and median forecast MAPE
+- **Demand Breakdowns** — Daily trend, day-of-week distribution, borough share, and year-over-year monthly patterns
+- **Forecast vs Actual** — Zone-level comparison of XGBoost predictions against actual demand
 
 Run locally:
 
@@ -105,8 +106,6 @@ Run locally:
 ## References
 
 - NYC Taxi & Limousine Commission. (n.d.). TLC Trip Record Data. https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
-
----
 
 **K Flowers**
 GitHub: [KRFlowers](https://github.com/KRFlowers)
