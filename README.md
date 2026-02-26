@@ -8,23 +8,23 @@ To examine this in practice, this project forecasts rideshare demand across New 
 
 ---
 
+## Scope
+
+- **Forecast horizon:** One-day-ahead forecasting is used as an initial benchmark to validate the data and modeling approach before extending to longer horizons
+- **Zone selection:** Zones with highly correlated demand patterns were selected so a single model could be applied (195 zones were modeled, 82% of total trip volume)
+
+---
+
 ## Approach
 
-The project is organized as a notebook-based pipeline.
+The analysis follows a four-stage notebook pipeline.
 
-- **00_data_download.ipynb**  
-  Downloaded and consolidated monthly FHVHV files into a unified Parquet dataset using DuckDB for memory-efficient processing.
+1. **Data Download** — Download and consolidate monthly trip files into a single Parquet dataset
+2. **Data Validation** — Validate trip records against thresholds for duration, distance, and fare
+3. **Exploratory Analysis** — Examine demand patterns for seasonality, trend, and cross-zone correlation
+4. **Demand Forecasting** — Evaluate three models, select the best performer, scale model across selected zones
 
-- **01_data_validation.ipynb**  
-  Validated trip records against duration, distance, and fare thresholds. Flagged invalid records and exported a clean dataset for analysis.
-
-- **02_exploratory_analysis.ipynb**  
-  Examined seasonality, trend stability, and cross-zone correlation patterns.
-
-- **03_demand_forecasting.ipynb**  
-  Compared Seasonal Naive, Prophet, and XGBoost models. Selected the best-performing approach and scaled forecasts across eligible zones.
-
-- **Streamlit Dashboard** — Interactive Streamlit dashboard for demand and analysis review (see [below](#streamlit-dashboard))
+An interactive Streamlit dashboard is also included for demand and forecast review (see [below](#streamlit-dashboard)).
 
 ---
 
@@ -34,28 +34,28 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 ### Model Performance
 
-- **XGBoost achieved an average 6.4% MAPE across 195 zones**
+- **XGBoost achieved an average 6.4% MAPE across the selected for modeling**
 - 97% of zones met the <10% MAPE performance target
-- Seasonal Naive provided a strong baseline
-- Prophet underperformed for short-horizon forecasting
+- Seasonal Naive model provided a good initial baseline
+- Prophet appeared too complex for the short-term horizon forecast
 
 ### Demand Patterns
 
-- Weekly seasonality was the dominant demand signal
-- Weekend demand averaged higher than weekdays
-- High-correlation zones accounted for 82% of total trip volume, supporting a shared modeling approach
+- Day-of-week patterns, indicating weekly seasonality, provided the most consistent demand signal
+- Weekend demand was generally higher than weekdays
+- Zones highly correlated with global demand accounted for for the majority of total trip volume, supporting a shared modeling approach
 
 ---
 
 ## Streamlit Dashboard
 
-The project includes an interactive Streamlit dashboard for exploring demand patterns and forecast performance.
+The project also includes an interactive Streamlit dashboard for exploring demand patterns and forecast results.
 
 ![Operations Dashboard](images/dashboard_screenshot.png)
 
 - **KPI Summary** — Total trips, average daily demand, peak day, and median forecast MAPE
-- **Demand Breakdowns** — Daily trend, day-of-week distribution, borough share, and year-over-year monthly patterns
-- **Forecast vs Actual** — Zone-level comparison of XGBoost predictions against actual demand
+- **Demand Charts** — Daily trend, day-of-week and borough distributions, and year-over-year monthly comparison
+- **Forecast vs Actual** — Zone-level comparison of predicted vs actual demand for a selected zone with MAPE displayed
 
 Run locally:
 
@@ -65,19 +65,20 @@ Run locally:
 
 ## Analysis Limitations
 
-- Forecast horizon limited to one-day-ahead predictions
-- External variables (weather, events, policy changes) were not incorporated
-- Low-correlation zones (e.g., airports, entertainment districts) were excluded from modeling
+- Forecast horizon was limited to one-day-ahead predictions
+- External variables that may affect demand (weather, events, policy changes) were not included
+- Low-correlation zones (airports, entertainment districts) were not included in modeling
 
 ---
 
 ## Next Steps
 
 - Extend forecasting horizon to 7–14 days
+- Re-evaluate Prophet at longer horizons where its decomposition approach may be better suited
 - Incorporate time-series cross-validation
 - Explore hyperparameter optimization
+- Build additional models for outlier zones that show different demand patterns
 - Integrate external demand drivers (weather, events)
-- Develop specialized models for structurally distinct zones
 
 ---
 
