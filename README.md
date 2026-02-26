@@ -34,7 +34,7 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 ### Model Performance
 
-- **XGBoost achieved an average 6.4% MAPE across the selected for modeling**
+- **XGBoost achieved an average 6.4% MAPE across the zones selected for modeling**
 - 97% of zones met the <10% MAPE performance target
 - Seasonal Naive model provided a good initial baseline
 - Prophet appeared too complex for the short-term horizon forecast
@@ -43,7 +43,7 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 - Day-of-week patterns, indicating weekly seasonality, provided the most consistent demand signal
 - Weekend demand was generally higher than weekdays
-- Zones highly correlated with global demand accounted for for the majority of total trip volume, supporting a shared modeling approach
+- Zones highly correlated with global demand accounted for the majority of total trip volume, supporting a shared modeling approach
 
 ---
 
@@ -63,7 +63,7 @@ Run locally:
 
 ---
 
-## Analysis Limitations
+## Limitations
 
 - Forecast horizon was limited to one-day-ahead predictions
 - External variables that may affect demand (weather, events, policy changes) were not included
@@ -73,9 +73,15 @@ Run locally:
 
 ## Next Steps
 
+A detailed analysis report was created that identified the possible enhancements below. These were captured in an enhancement roadmap located in [`docs/`](docs/).
+
+- Incorporate time-series cross-validation (rolling/expanding window)
 - Extend forecasting horizon to 7–14 days
 - Re-evaluate Prophet at longer horizons where its decomposition approach may be better suited
-- Incorporate time-series cross-validation
+- Add residual diagnostics (Ljung-Box test, ACF/PACF validation, segmented analysis by borough)
+- Apply SHAP analysis for zone-level feature interpretation
+- Evaluate additional models (LightGBM, ARIMA/SARIMAX)
+- Add statistical significance testing (Diebold-Mariano, bootstrap CIs)
 - Explore hyperparameter optimization
 - Build additional models for outlier zones that show different demand patterns
 - Integrate external demand drivers (weather, events)
