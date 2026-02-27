@@ -10,7 +10,7 @@ This project demonstrates a solution by forecasting rideshare volume across 195 
 
 ## Scope
 
-- **Forecast horizon:** One-day-ahead forecasting is used as an initial benchmark to validate the data and modeling approach before extending to longer horizons
+- **Forecast horizon:** This analysis focuses on short-term, one-day-ahead forecasting with the goal to provide an initial benchmark and to validate the data and modeling approach
 - **Zone selection:** Zones with highly correlated demand patterns were selected so a single model could be applied (195 zones were modeled, 82% of total trip volume)
 
 ---
@@ -24,7 +24,7 @@ The analysis follows a four-stage notebook pipeline.
 3. **Exploratory Analysis** — Examine demand patterns for seasonality, trend, and cross-zone correlation
 4. **Demand Forecasting** — Evaluate three models, select the best performer, scale model across selected zones
 
-An interactive Streamlit dashboard is also included for demand and forecast review (see [below](#streamlit-dashboard)).
+The project also includes an interactive Streamlit dashboard showing KPIs, demand charts, and zone-level forecast accuracy (see [below](#streamlit-dashboard)).
 
 ---
 
@@ -49,7 +49,7 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 ## Streamlit Dashboard
 
-The project also includes an interactive Streamlit dashboard for exploring demand patterns and forecast results.
+An interactive dashboard showing KPIs, demand charts, and zone-level forecast accuracy
 
 ![Operations Dashboard](images/dashboard_screenshot.png)
 
