@@ -1,10 +1,10 @@
 # NYC Rideshare Demand Forecasting
 
-## Overview
+## Project Overview
 
-Effective forecasting is critical to business planning and particularly essential in industries with volatile demand such as rideshare. This variability in demand makes adequate staffing an ongoing operational challenge. Developing reliable forecasts enables operators to make more informed staffing decisions. The result is greater operational efficiency for the company and more predictable, better-utilized working hours for drivers.
+In the demand-driven rideshare industry, unpredictability creates a constant staffing challenge. Inaccurate demand forecasting results in either **excessive costs** from driver surpluses or **degraded service** from driver shortages. This is where high-accuracy forecasting provides a critical advantage, as it allows operators to maximize efficiency while ensuring workers have **predictable schedules**.
 
-To examine this in practice, this project forecasts rideshare demand across New York City's taxi zones using 684 million publicly available trip records from 2022–2024. Seasonal Naive, Prophet, and XGBoost models were evaluated across 195 high-volume zones representing 82% of total trip volume. XGBoost delivered the strongest performance, achieving an average MAPE of 6.4%, with 97% of zones below the 10% error target.
+This project demonstrates a solution by forecasting rideshare volume across 195 NYC zones using **684 million trip records**. After evaluating Seasonal Naïve, Prophet, and XGBoost, **XGBoost was the strongest performer**, achieving a **6.4% average MAPE** with 97% of zones meeting the 10% error target.
 
 ---
 
