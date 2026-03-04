@@ -63,6 +63,22 @@ Run locally:
 
 ---
 
+## SQL Explorer
+
+An interactive SQL-powered data exploration tool for querying all 684 million trip records directly using DuckDB.
+
+- **Browse & Filter** — Explore raw trip records with date, borough, zone, company, and day-of-week filters
+- **Pre-Built Queries** — 16 analytical queries spanning aggregations, window functions, CTEs, JOINs, date/time analysis, and data quality checks — each with a "View SQL" expander showing the exact query
+- **Custom SQL** — Write and run your own SQL against the full dataset (with a row limit safeguard)
+
+Run locally:
+
+    streamlit run app/sql_explorer.py
+
+> **Prerequisite:** The raw trip data (~18 GB) must be downloaded first by running `notebooks/00_data_download.ipynb`.
+
+---
+
 ## Limitations
 
 - Forecast horizon was limited to one-day-ahead predictions
@@ -109,6 +125,34 @@ A detailed analysis report was created that identified the possible enhancements
 - Streamlit, Plotly
 
 ---
+
+## Repository Structure
+
+```
+├── data/
+│   ├── raw/                 # Original TLC trip files
+│   ├── validated/           # Flagged and validated records
+│   ├── processed/           # Consolidated parquet dataset
+│   ├── quality_reports/     # Validation summary reports
+│   └── results/             # Forecast outputs and model results
+├── notebooks/               # Four-stage analysis pipeline
+├── app/                     # Streamlit dashboards (operations dashboard + SQL explorer)
+├── docs/                    # Enhancement roadmap and extended report
+├── images/                  # README visual assets
+└── requirements.txt         # Pinned dependencies
+```
+---
+
+## Reproducibility & Validation
+
+- Python 3.x environment with pinned dependencies (see `requirements.txt`)
+- Random seeds fixed for all stochastic model training steps
+- Raw data downloaded and consolidated programmatically
+- Data validation and preprocessing executed entirely via code (no manual edits)
+- One-day-ahead forecasting evaluated using temporal holdout validation
+- Transformations applied after appropriate temporal separation to prevent leakage
+- Notebook executes fully from top to bottom without hidden state
+- Streamlit dashboard built from saved model outputs
 
 ## References
 
