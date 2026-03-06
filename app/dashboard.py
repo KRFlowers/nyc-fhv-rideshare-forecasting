@@ -62,7 +62,7 @@ CHART_FONT = dict(family="Inter, system-ui, sans-serif", size=11, color=SLATE)
 # ---------------------------------------------------------------------------
 # Data loading (cached)
 # ---------------------------------------------------------------------------
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).parent.parent / "data"
 
 
 @st.cache_data
