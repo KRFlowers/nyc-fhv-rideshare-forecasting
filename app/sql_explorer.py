@@ -386,7 +386,7 @@ def render_header(info: dict):
         f'<p class="v3-info">'
         f'<strong>{info["row_count"] / 1e6:.0f}M rows</strong> &middot; '
         f'{info["zone_count"]} zones &middot; {info["file_size_gb"]:.1f} GB '
-        f'&middot; {_min} &ndash; {_max}</p>'
+        f'&middot; {_min} &ndash; {_max} &middot; Raw unfiltered data</p>'
         '</div>'
         '</div>',
         unsafe_allow_html=True,
@@ -642,6 +642,12 @@ def build_column_config(df) -> dict:
         "hvfhs_license_num": st.column_config.TextColumn(
             help="HV0003 = Uber  |  HV0004 = Via  |  HV0005 = Lyft"
         ),
+
+        # Q02 — MoM growth display labels
+        "trips":      st.column_config.NumberColumn("Current Month Trips"),
+        "prev_month": st.column_config.NumberColumn("Prev Month Trips"),
+        "trip_diff":  st.column_config.NumberColumn("Trip Difference"),
+        "growth_pct": st.column_config.NumberColumn("Growth %"),
     }
 
     # If 'month' is a date/datetime column, format as "MMM YYYY" (Q07);
@@ -795,16 +801,27 @@ with tab_prebuilt:
 
     with col_select:
         st.markdown("<div style='margin-top:-12px'></div>", unsafe_allow_html=True)
+        try:
+            _pb_metrics = get_browse_metrics(
+                str(filters["start_date"]),
+                str(filters["end_date"]),
+                tuple(sorted(filters["boroughs"])),
+                tuple(sorted(filters["companies"])),
+            )
+            _match_count = _pb_metrics["trip_count"]
+        except Exception:
+            _match_count = None
         st.caption(
             format_filter_context(
                 filters["start_date"],
                 filters["end_date"],
+                match_count=_match_count,
             )
         )
         selected_option = st.radio(
             "query", _query_labels, index=None,
             label_visibility="collapsed", key="q_selected",
-        )
+            )
 
     with col_results:
         if selected_option is None:

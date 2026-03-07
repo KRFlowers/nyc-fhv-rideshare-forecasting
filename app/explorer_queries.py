@@ -54,6 +54,7 @@ WITH monthly AS (
 )
 SELECT Borough, month, trips,
        LAG(trips) OVER (PARTITION BY Borough ORDER BY month) AS prev_month,
+       trips - LAG(trips) OVER (PARTITION BY Borough ORDER BY month) AS trip_diff,
        ROUND(100.0 * (trips - LAG(trips) OVER (PARTITION BY Borough ORDER BY month))
              / NULLIF(LAG(trips) OVER (PARTITION BY Borough ORDER BY month), 0), 1
        ) AS growth_pct
@@ -81,6 +82,10 @@ daily AS (
 )
 SELECT Borough, day_type,
        ROUND(AVG(trips), 0) AS avg_daily_trips,
+       ROUND(STDDEV(trips), 0) AS stddev_daily_trips,
+       MIN(trips) AS min_daily_trips,
+       MAX(trips) AS max_daily_trips,
+       SUM(trips) AS total_trips,
        COUNT(DISTINCT trip_date) AS num_days
 FROM daily
 GROUP BY Borough, day_type
