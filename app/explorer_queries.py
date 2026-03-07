@@ -393,11 +393,14 @@ QUERY_REGISTRY: list[QueryDef] = [
 
 
 def get_query_display_options() -> list[str]:
-    """Build display strings for the radio list with category headers."""
-    options = []
-    current_cat = None
-    for q in QUERY_REGISTRY:
-        if q.category != current_cat:
-            current_cat = q.category
-        options.append(f"{q.category} — {q.name}")
-    return options
+    """Build numbered display strings for the radio list (Q01, Q02, ...)."""
+    _cat_labels = {
+        "BOROUGH": "Borough",
+        "ZONE": "Zone",
+        "OVERALL": "Overall",
+        "DATA QUALITY": "Data Quality",
+    }
+    return [
+        f"Q{i+1:02d} · {_cat_labels.get(q.category, q.category)} — {q.name}"
+        for i, q in enumerate(QUERY_REGISTRY)
+    ]

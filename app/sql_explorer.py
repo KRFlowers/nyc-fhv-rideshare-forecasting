@@ -29,7 +29,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from explorer_styles import COMPANY_CODES
-from explorer_queries import QUERY_REGISTRY
+from explorer_queries import QUERY_REGISTRY, get_query_display_options
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +121,18 @@ def inject_global_css():
     }
     .stButton > button:hover {
         background: #0F766E;
+    }
+    .stButton > button[kind="secondary"] {
+        background:    transparent !important;
+        color:         #9CA3AF !important;
+        border:        none !important;
+        font-size:     11px !important;
+        font-weight:   400 !important;
+        padding:       4px 8px !important;
+    }
+    .stButton > button[kind="secondary"]:hover {
+        color:         #374151 !important;
+        background:    transparent !important;
     }
 
     /* ── Radio label text ── */
@@ -381,28 +393,48 @@ def render_header(info: dict):
     )
 
 
+def _reset_date_range():
+    """Callback to reset date range before widget re-renders."""
+    st.session_state["date_range_input"] = (
+        st.session_state["_date_min"],
+        st.session_state["_date_max"],
+    )
+
+
 def render_filters(info: dict) -> dict:
     """Render the filter toolbar and return filter values."""
+    # Store min/max in session state for the reset callback
+    st.session_state["_date_min"] = info["min_date"]
+    st.session_state["_date_max"] = info["max_date"]
+
+    # Initialize date range on first load only
+    if "date_range_input" not in st.session_state:
+        st.session_state["date_range_input"] = (info["min_date"], info["max_date"])
+
     # ── White filter bar ──────────────────────────────────────────────
     st.markdown('<div class="v3-filter-bar"><p class="v3-filter-label">Filters</p></div>', unsafe_allow_html=True)
 
     filter_container = st.container()
     with filter_container:
-        col1, col2, col3, col4, _ = st.columns([1.8, 1.2, 1.2, 1.2, 3])
+        col1, col2, col3, col4, col_reset, _ = st.columns([1.8, 1.2, 1.2, 1.2, 0.8, 2.2])
 
         with col1:
             st.markdown("<p style='font-size:10px; font-weight:600; color:#9CA3AF; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:4px;'>Date Range</p>", unsafe_allow_html=True)
             date_range = st.date_input(
                 "Date Range",
-                value=(info["min_date"], info["max_date"]),
                 min_value=info["min_date"],
                 max_value=info["max_date"],
                 label_visibility="collapsed",
+                key="date_range_input",
             )
             if isinstance(date_range, tuple) and len(date_range) == 2:
                 start_date, end_date = date_range
             else:
                 start_date = end_date = info["min_date"]
+
+        with col_reset:
+            st.markdown("<p style='font-size:10px; margin-bottom:4px;'>&nbsp;</p>", unsafe_allow_html=True)
+            st.button("Reset", key="reset_dates", type="secondary", on_click=_reset_date_range)
 
         with col2:
             st.markdown("<p style='font-size:10px; font-weight:600; color:#9CA3AF; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:4px;'>Borough</p>", unsafe_allow_html=True)
@@ -556,7 +588,8 @@ def get_browse_metrics(
            ROUND(AVG(t.base_passenger_fare), 2) AS avg_fare,
            ROUND(AVG(t.trip_miles), 1) AS avg_miles,
            ROUND(AVG(t.trip_time / 60.0), 0) AS avg_duration_min,
-           ROUND(AVG(t.tips), 2) AS avg_tips
+           ROUND(AVG(t.tips), 2) AS avg_tips,
+           COUNT(DISTINCT t.PULocationID) AS zones_active
     FROM trips t
     JOIN zones pz ON t.PULocationID = pz.zone_id
     {where}
@@ -568,6 +601,7 @@ def get_browse_metrics(
         "avg_miles": row[2],
         "avg_duration_min": row[3],
         "avg_tips": row[4],
+        "zones_active": row[5],
         "sql": sql.strip(),
     }
 
@@ -654,10 +688,10 @@ tab_browse, tab_prebuilt, tab_custom = st.tabs(
 
 # ---- Browse & Filter Tab ----
 with tab_browse:
-    try:
-        # Filter toolbar (only on this tab)
-        filters = render_filters(dataset_info)
+    # Filter toolbar (only on this tab) — outside try so filters is always defined
+    filters = render_filters(dataset_info)
 
+    try:
         # Compute summary metrics
         with st.spinner("Computing summary statistics..."):
             metrics = get_browse_metrics(
@@ -677,8 +711,8 @@ with tab_browse:
             )
         )
 
-        # 5 KPI metric cards
-        k1, k2, k3, k4, k5 = st.columns(5)
+        # 6 KPI metric cards
+        k1, k2, k3, k4, k5, k6 = st.columns(6)
         k1.metric("Matching Trips", f"{metrics['trip_count'] / 1e6:,.1f}M")
         k2.metric("Avg Fare", f"${metrics['avg_fare']:,.2f}")
         k3.metric("Avg Miles", f"{metrics['avg_miles']:.1f}")
@@ -689,6 +723,7 @@ with tab_browse:
             else "\u2014",
         )
         k5.metric("Avg Tips", f"${metrics['avg_tips']:,.2f}")
+        k6.metric("Zone Count", f"{metrics['zones_active']}")
 
         sort_col = filters["sort_col"]
 
@@ -711,8 +746,16 @@ LIMIT 1000
         with st.spinner(f"Sorting {metrics['trip_count']:,} trips by {sort_col}..."):
             df_browse, elapsed_browse = execute_query(sample_sql)
 
-        # Result bar with timing + export
-        result_bar(df_browse, elapsed_browse, total=metrics["trip_count"])
+        # Export CSV inline link + timing
+        if not df_browse.empty:
+            csv_data = df_browse.to_csv(index=False)
+            b64 = base64.b64encode(csv_data.encode()).decode()
+            st.markdown(
+                f'<a href="data:file/csv;base64,{b64}" download="browse_results.csv" '
+                f'style="font-size:13px; color:{ACCENT}; text-decoration:none; '
+                f'float:right; margin-top:4px; margin-bottom:8px;">↓ Export CSV</a>',
+                unsafe_allow_html=True,
+            )
 
         # Formatted table
         st.dataframe(
@@ -721,6 +764,16 @@ LIMIT 1000
             hide_index=True,
             height=340,
             column_config=build_column_config(df_browse),
+            column_order=[
+                "pickup_datetime", "pickup_borough", "pickup_zone",
+                "hvfhs_license_num", "trip_miles", "trip_time",
+                "base_passenger_fare", "tips", "driver_pay",
+            ],
+        )
+
+        st.caption(
+            f"Showing {len(df_browse):,} of {metrics['trip_count']:,} rows "
+            f"· queried in {elapsed_browse:.1f}s"
         )
 
         # View SQL expanders
@@ -735,24 +788,7 @@ LIMIT 1000
 # ---- Pre-Built Queries Tab ----
 with tab_prebuilt:
 
-    _query_labels = [
-        "Q01 · Borough — Trip volume",
-        "Q02 · Borough — Month-over-month growth",
-        "Q03 · Borough — Weekend vs weekday demand",
-        "Q04 · Borough — Hour anlysis by borough",
-        "Q05 · Zone — Busiest zones top 20",
-        "Q06 · Zone — Rolling 7-day average",
-        "Q07 · Zone — Rank by monthly volume",
-        "Q08 · Zone — Top pickup-to-dropoff routes",
-        "Q09 · Overall — Company market share by month",
-        "Q10 · Overall — Trip metrics by distance tier",
-        "Q11 · Overall — Seasonal patterns",
-        "Q12 · Overall — Holiday vs non-holiday",
-        "Q13 · Data Quality — Temporal coverage",
-        "Q14 · Data Quality — Zero and negative values",
-        "Q15 · Data Quality — Null/missing summary",
-        "Q16 · Data Quality — Outlier detection",
-    ]
+    _query_labels = get_query_display_options()
     _label_to_idx = {label: i for i, label in enumerate(_query_labels)}
 
     col_select, col_results = st.columns([1.0, 3.0])
@@ -801,6 +837,12 @@ with tab_prebuilt:
                 )
                 zone_id = int(zone_selection.split("(")[-1].rstrip(")"))
                 zone_name = zone_selection.split(" (")[0]
+
+            # Q02 date range warning
+            if selected_option.startswith("Q02"):
+                days_span = (filters["end_date"] - filters["start_date"]).days
+                if days_span < 60:
+                    st.warning("This query works best with a date range of 60 days or more.")
 
             # Build and execute query
             try:
@@ -878,8 +920,11 @@ with tab_custom:
                 auto_limited = True
 
             try:
+                placeholder = st.empty()
+                placeholder.info("Preparing query...")
                 with st.spinner("Running custom query..."):
                     df_custom, elapsed_custom = execute_query(sql_to_run)
+                placeholder.empty()
 
                 if auto_limited:
                     st.caption("Auto-applied LIMIT 10,000 for safety.")
