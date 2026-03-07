@@ -739,7 +739,7 @@ with tab_prebuilt:
         "Q01 · Borough — Trip volume",
         "Q02 · Borough — Month-over-month growth",
         "Q03 · Borough — Weekend vs weekday demand",
-        "Q04 · Borough — Peak hour analysis",
+        "Q04 · Borough — Hour anlysis by borough",
         "Q05 · Zone — Busiest zones top 20",
         "Q06 · Zone — Rolling 7-day average",
         "Q07 · Zone — Rank by monthly volume",
@@ -836,7 +836,16 @@ with tab_prebuilt:
                         height=380,
                         column_config=build_column_config(df_pb),
                     )
-                    if "month_num" in df_pb.columns:
+                    _column_orders = {
+                        "Q04": ["Borough", "rank", "hour", "trips"],
+                        "Q05": ["Zone", "Borough", "rank", "total_trips"],
+                        "Q07": ["Zone", "Borough", "rank", "month", "trips"],
+                        "Q08": ["pickup_zone", "dropoff_zone", "pickup_borough", "dropoff_borough", "rank", "total_trips"],
+                    }
+                    q_key = selected_option[:3]
+                    if q_key in _column_orders:
+                        df_kwargs["column_order"] = _column_orders[q_key]
+                    elif "month_num" in df_pb.columns:
                         df_kwargs["column_order"] = [c for c in df_pb.columns if c != "month_num"]
                     st.dataframe(**df_kwargs)
 

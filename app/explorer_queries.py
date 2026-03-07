@@ -67,8 +67,8 @@ def build_borough_weekday_weekend(start_date: str, end_date: str, **kw) -> str:
 WITH classified AS (
     SELECT pz.Borough,
            CAST(t.pickup_datetime AS DATE) AS trip_date,
-           CASE WHEN DAYOFWEEK(t.pickup_datetime) IN (0, 6) THEN 'Weekend'
-                ELSE 'Weekday' END AS day_type
+           CASE WHEN DAYOFWEEK(t.pickup_datetime) IN (0, 6) THEN 'Weekend (Sat–Sun)'
+                ELSE 'Weekday (Mon–Fri)' END AS day_type
     FROM trips t
     JOIN zones pz ON t.PULocationID = pz.zone_id
     WHERE t.pickup_datetime >= '{start_date}'
@@ -100,8 +100,8 @@ WITH hourly AS (
       AND t.pickup_datetime < '{end_date}'::DATE + INTERVAL 1 DAY
     GROUP BY pz.Borough, EXTRACT(HOUR FROM t.pickup_datetime)
 )
-SELECT Borough, hour, trips,
-       RANK() OVER (PARTITION BY Borough ORDER BY trips DESC) AS rank
+SELECT RANK() OVER (PARTITION BY Borough ORDER BY trips DESC) AS rank,
+       Borough, hour, trips
 FROM hourly
 ORDER BY Borough, rank
 """.strip()
@@ -112,7 +112,8 @@ ORDER BY Borough, rank
 # ---------------------------------------------------------------------------
 def build_zone_busiest(start_date: str, end_date: str, **kw) -> str:
     return f"""
-SELECT pz.Zone, pz.Borough, COUNT(*) AS total_trips
+SELECT ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) AS rank,
+       pz.Zone, pz.Borough, COUNT(*) AS total_trips
 FROM trips t
 JOIN zones pz ON t.PULocationID = pz.zone_id
 WHERE t.pickup_datetime >= '{start_date}'
@@ -162,7 +163,7 @@ ranked AS (
            DENSE_RANK() OVER (PARTITION BY month ORDER BY trips DESC) AS rank
     FROM monthly
 )
-SELECT month, Zone, Borough, trips, rank
+SELECT rank, month, Zone, Borough, trips
 FROM ranked
 WHERE rank <= 10
 ORDER BY month, rank
@@ -171,7 +172,8 @@ ORDER BY month, rank
 
 def build_zone_top_routes(start_date: str, end_date: str, **kw) -> str:
     return f"""
-SELECT pz.Zone AS pickup_zone, dz.Zone AS dropoff_zone,
+SELECT ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) AS rank,
+       pz.Zone AS pickup_zone, dz.Zone AS dropoff_zone,
        pz.Borough AS pickup_borough, dz.Borough AS dropoff_borough,
        COUNT(*) AS total_trips
 FROM trips t
@@ -263,13 +265,24 @@ daily AS (
       AND pickup_datetime < '{end_date}'::DATE + INTERVAL 1 DAY
     GROUP BY CAST(pickup_datetime AS DATE)
 )
-SELECT CASE WHEN h.holiday_date IS NOT NULL THEN 'Holiday'
-            ELSE 'Non-Holiday' END AS day_type,
-       ROUND(AVG(d.trips), 0) AS avg_daily_trips,
-       COUNT(*) AS num_days
-FROM daily d
-LEFT JOIN holidays h ON d.trip_date = h.holiday_date
-GROUP BY day_type
+SELECT day_type, avg_daily_trips, total_trips, num_days,
+       ROUND(100.0 * (avg_daily_trips - non_holiday_avg) / NULLIF(non_holiday_avg, 0), 1) AS pct_difference
+FROM (
+    SELECT CASE WHEN h.holiday_date IS NOT NULL THEN 'Holiday'
+                ELSE 'Non-Holiday' END AS day_type,
+           ROUND(AVG(d.trips), 0) AS avg_daily_trips,
+           SUM(d.trips) AS total_trips,
+           COUNT(*) AS num_days
+    FROM daily d
+    LEFT JOIN holidays h ON d.trip_date = h.holiday_date
+    GROUP BY day_type
+) sub
+CROSS JOIN (
+    SELECT ROUND(AVG(d.trips), 0) AS non_holiday_avg
+    FROM daily d
+    LEFT JOIN holidays h ON d.trip_date = h.holiday_date
+    WHERE h.holiday_date IS NULL
+) base
 ORDER BY day_type
 """.strip()
 
