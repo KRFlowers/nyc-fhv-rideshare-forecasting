@@ -367,8 +367,8 @@ QUERY_REGISTRY: list[QueryDef] = [
     QueryDef("zone_rank_monthly", "Rank zones by monthly volume", "ZONE", False, False, build_zone_rank_monthly),
     QueryDef("zone_top_routes", "Top pickup-to-dropoff routes", "ZONE", False, False, build_zone_top_routes),
     # Overall
-    QueryDef("overall_market", "Company market share", "OVERALL", True, False, build_overall_market_share),
-    QueryDef("overall_fare_dist", "Average fare by distance tier", "OVERALL", False, False, build_overall_fare_by_distance),
+    QueryDef("overall_market", "Company market share by month", "OVERALL", True, False, build_overall_market_share),
+    QueryDef("overall_fare_dist", "Trip metrics by distance tier", "OVERALL", False, False, build_overall_fare_by_distance),
     QueryDef("overall_seasonal", "Seasonal patterns across years", "OVERALL", True, False, build_overall_seasonal),
     QueryDef("overall_holiday", "Holiday vs non-holiday demand", "OVERALL", False, False, build_overall_holiday),
     # Data Quality
