@@ -31,6 +31,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from explorer_styles import COMPANY_CODES
 from explorer_queries import QUERY_REGISTRY, get_query_display_options
 
+# ---------------------------------------------------------------------------
+# Data paths (app/v3/ -> app/ -> project root -> data/raw)
+# ---------------------------------------------------------------------------
+DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
+PARQUET_PATH = DATA_DIR / "combined_fhvhv_tripdata.parquet"
+ZONES_PATH = DATA_DIR / "zone_metadata.csv"
+
 
 # ---------------------------------------------------------------------------
 # Page config
@@ -49,6 +56,7 @@ SURFACE = "#F8FAFC"
 # CSS — Global styles (Step 1 of 11) + horizontal layout overrides
 # ---------------------------------------------------------------------------
 def inject_global_css():
+    """Inject all custom CSS styles into the Streamlit page."""
     st.markdown("""
     <style>
 
@@ -286,14 +294,6 @@ inject_global_css()
 
 
 # ---------------------------------------------------------------------------
-# Data paths (app/v3/ -> app/ -> project root -> data/raw)
-# ---------------------------------------------------------------------------
-DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
-PARQUET_PATH = DATA_DIR / "combined_fhvhv_tripdata.parquet"
-ZONES_PATH = DATA_DIR / "zone_metadata.csv"
-
-
-# ---------------------------------------------------------------------------
 # Startup: file checks
 # ---------------------------------------------------------------------------
 def check_data_files() -> bool:
@@ -325,6 +325,8 @@ def init_duckdb() -> duckdb.DuckDBPyConnection:
     con.execute("SET threads=6")
     con.execute("SET preserve_insertion_order=false")
     con.execute("SET enable_progress_bar=false")
+    # Create virtual views — trips and zones are referenced by all queries
+    # throughout the app. Data stays in files on disk — DuckDB reads directly.
     con.execute(
         f"CREATE OR REPLACE VIEW trips AS "
         f"SELECT * FROM read_parquet('{PARQUET_PATH.as_posix()}')"
@@ -394,7 +396,7 @@ def render_header(info: dict):
 
 
 def _reset_date_range():
-    """Callback to reset date range before widget re-renders."""
+    """Callback to reset date range to dataset min/max before widget re-renders."""
     st.session_state["date_range_input"] = (
         st.session_state["_date_min"],
         st.session_state["_date_max"],
@@ -402,7 +404,7 @@ def _reset_date_range():
 
 
 def render_filters(info: dict) -> dict:
-    """Render the filter toolbar and return filter values."""
+    """Render the filter toolbar and return active filter values as a dict."""
     # Store min/max in session state for the reset callback
     st.session_state["_date_min"] = info["min_date"]
     st.session_state["_date_max"] = info["max_date"]
@@ -518,6 +520,7 @@ def build_where_clause(
     alias: str = "t",
     zone_alias: str = "pz",
 ) -> str:
+    """Build a SQL WHERE clause string from active filter values."""
     clauses = [
         f"{alias}.pickup_datetime >= '{start_date}'",
         f"{alias}.pickup_datetime < '{end_date}'::DATE + INTERVAL 1 DAY",
@@ -540,13 +543,14 @@ def execute_query(sql: str) -> tuple[pd.DataFrame, float]:
     return df, elapsed
 
 
-def format_filter_context(
+def format_filter_bar(
     start_date,
     end_date,
     boroughs: list[str] | None = None,
     match_count: int | None = None,
     zone_name: str | None = None,
 ) -> str:
+    """Build the Filtered: caption string from date range and optional context."""
     if isinstance(start_date, dt_date):
         s = start_date.strftime("%b %d, %Y")
     else:
@@ -573,7 +577,7 @@ def format_filter_context(
 # Browse metrics (cached)
 # ---------------------------------------------------------------------------
 @st.cache_data(ttl=600)
-def get_browse_metrics(
+def get_metric_values(
     start_date: str, end_date: str,
     boroughs: tuple, companies: tuple,
 ) -> dict:
@@ -659,8 +663,8 @@ def build_column_config(df) -> dict:
     return {k: v for k, v in base_config.items() if k in df.columns}
 
 
-def result_bar(df: pd.DataFrame, elapsed: float, total: int | None = None):
-    """Render the result count + timing caption and export button."""
+def render_result_bar(df: pd.DataFrame, elapsed: float, total: int | None = None):
+    """Render row count, timing caption, and Export CSV link below a dataframe."""
     r1, r2 = st.columns([4, 1])
     with r1:
         if total and total > len(df):
@@ -685,7 +689,8 @@ def result_bar(df: pd.DataFrame, elapsed: float, total: int | None = None):
 
 
 # ---------------------------------------------------------------------------
-# Tabs
+# Main — app entry point
+# All functions are defined above. Execution begins here on every page load.
 # ---------------------------------------------------------------------------
 tab_browse, tab_prebuilt, tab_custom = st.tabs(
     ["Browse & Filter", "Pre-Built Queries", "Custom SQL"]
@@ -700,7 +705,7 @@ with tab_browse:
     try:
         # Compute summary metrics
         with st.spinner("Computing summary statistics..."):
-            metrics = get_browse_metrics(
+            metrics = get_metric_values(
                 str(filters["start_date"]),
                 str(filters["end_date"]),
                 tuple(sorted(filters["boroughs"])),
@@ -709,7 +714,7 @@ with tab_browse:
 
         # Filter context line
         st.caption(
-            format_filter_context(
+            format_filter_bar(
                 filters["start_date"],
                 filters["end_date"],
                 filters["boroughs"],
@@ -802,7 +807,7 @@ with tab_prebuilt:
     with col_select:
         st.markdown("<div style='margin-top:-12px'></div>", unsafe_allow_html=True)
         try:
-            _pb_metrics = get_browse_metrics(
+            _pb_metrics = get_metric_values(
                 str(filters["start_date"]),
                 str(filters["end_date"]),
                 tuple(sorted(filters["boroughs"])),
@@ -812,7 +817,7 @@ with tab_prebuilt:
         except Exception:
             _match_count = None
         st.caption(
-            format_filter_context(
+            format_filter_bar(
                 filters["start_date"],
                 filters["end_date"],
                 match_count=_match_count,
@@ -949,7 +954,7 @@ with tab_custom:
                 if df_custom.empty:
                     st.info("Query returned no results.")
                 else:
-                    result_bar(df_custom, elapsed_custom)
+                    render_result_bar(df_custom, elapsed_custom)
                     st.dataframe(
                         df_custom,
                         use_container_width=True,

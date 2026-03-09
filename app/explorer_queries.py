@@ -390,7 +390,7 @@ QUERY_REGISTRY: list[QueryDef] = [
     QueryDef("overall_seasonal", "Seasonal patterns across years", "OVERALL", True, False, build_overall_seasonal),
     QueryDef("overall_holiday", "Holiday vs non-holiday demand", "OVERALL", False, False, build_overall_holiday),
     # Data Quality
-    QueryDef("dq_temporal", "Temporal coverage — records per month", "DATA QUALITY", True, False, build_dq_temporal_coverage),
+    QueryDef("dq_temporal", "Record count by month", "DATA QUALITY", True, False, build_dq_temporal_coverage),
     QueryDef("dq_zero_neg", "Zero and negative value scan", "DATA QUALITY", False, False, build_dq_zero_negative),
     QueryDef("dq_nulls", "Null/missing value summary", "DATA QUALITY", False, False, build_dq_null_summary),
     QueryDef("dq_outliers", "Outlier detection — extreme values", "DATA QUALITY", False, False, build_dq_outliers),
