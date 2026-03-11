@@ -1,5 +1,8 @@
 # Project-specific excludes
 notes/
+scripts/
+.pylintrc
+run_app.bat
 
 # Data files (DON'T COMMIT 18GB DATASETS!)
 data/raw/*

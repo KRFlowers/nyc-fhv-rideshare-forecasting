@@ -21,6 +21,8 @@ st.set_page_config(
 # Color palette
 BLUE = "#2563EB"
 BLUE_LIGHT = "#93C5FD"
+TEAL = "#0891B2"
+TEAL_LIGHT = "#67E8F9"
 SLATE = "#475569"
 EMERALD = "#059669"
 AMBER = "#D97706"
@@ -28,17 +30,29 @@ AMBER = "#D97706"
 # Compact CSS for single-screen fit
 st.markdown(
     """<style>
-    .block-container {padding:0.8rem 1.5rem 0rem 1.5rem;}
-    h1 {margin:0 0 0.1rem 0; font-size:1.5rem; color:#1E293B;}
-    h3 {margin:0.3rem 0 0 0; font-size:0.85rem; color:#475569; font-weight:600;}
-    .stCaption {margin:0; padding:0;}
-    .stCaption p {color:#94A3B8; font-size:0.7rem;}
-    [data-testid="stMetric"] {
-        background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px;
-        padding:0.5rem 0.8rem; text-align:center;
+    .block-container {padding:0.8rem 1.5rem 0rem 1.5rem; padding-top:2.5rem;}
+    h2, h3 {
+        margin: 0.4rem 0 0 0;
+        font-size: 0.72rem !important;
+        color: #94A3B8 !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
     }
-    [data-testid="stMetricValue"] {font-size:1.5rem; color:#1E293B; justify-content:center;}
-    [data-testid="stMetricLabel"] {font-size:0.7rem; color:#64748B; justify-content:center; text-transform:uppercase; letter-spacing:0.05em;}
+    section[data-testid="stSidebar"] h1 {font-size:1rem !important; color:#475569 !important;}
+    .stCaption {margin:0; padding:0;}
+    .stCaption p {
+        color: #94A3B8;
+        font-size: 0.7rem;
+        margin-top: 0.25rem;
+        margin-bottom: 0.4rem;
+    }
+    [data-testid="stMetric"] {
+        background:#F8FAFC; border:1px solid #E2E8F0; border-radius:6px;
+        padding:0.3rem 0.5rem; text-align:center;
+    }
+    [data-testid="stMetricValue"] {font-size:1.05rem !important; font-weight:400 !important; color:#1E293B !important; justify-content:center;}
+    [data-testid="stMetricLabel"] {font-size:0.6rem !important; color:#94A3B8 !important; justify-content:center; text-transform:uppercase; letter-spacing:0.05em;}
     [data-testid="stVerticalBlock"] > div {gap:0.3rem;}
     [data-testid="stHorizontalBlock"] > div {gap:0.5rem;}
     .element-container {margin-bottom:0 !important;}
@@ -128,8 +142,13 @@ filtered = zone_daily[mask]
 # ---------------------------------------------------------------------------
 # Header + KPIs
 # ---------------------------------------------------------------------------
-st.title("NYC Rideshare Operations Dashboard")
-st.caption(f"High-Volume For-Hire Vehicle Trips  \u2022  {start_date:%b %Y} \u2013 {end_date:%b %Y}")
+st.markdown(
+    '<p style="font-size:1.625rem; font-weight:700; color:#0891B2; '
+    'margin:0 0 0.1rem 0; line-height:1.4;">'
+    'NYC Rideshare Operations Dashboard</p>',
+    unsafe_allow_html=True,
+)
+st.caption(f"NYC High-Volume For-Hire Vehicle Trips  \u2022  {start_date:%b %Y} \u2013 {end_date:%b %Y}")
 
 daily_totals = filtered.groupby("date")["daily_trips"].sum()
 total_trips = filtered["daily_trips"].sum()
@@ -154,8 +173,8 @@ daily_ts.columns = ["date", "trips"]
 fig_trend = go.Figure()
 fig_trend.add_trace(go.Scatter(
     x=daily_ts["date"], y=daily_ts["trips"],
-    mode="lines", line=dict(color=BLUE, width=1.2),
-    fill="tozeroy", fillcolor="rgba(37,99,235,0.08)",
+    mode="lines", line=dict(color=TEAL, width=1.2),
+    fill="tozeroy", fillcolor="rgba(8,145,178,0.08)",
     hovertemplate="%{x|%b %d, %Y}<br>%{y:,.0f} trips<extra></extra>",
 ))
 fig_trend.update_layout(
@@ -189,7 +208,7 @@ with col_a:
         x=dow["trips"], y=dow["label"], orientation="h",
         text=dow["pct"].apply(lambda v: f"{v:.1f}%"),
         textposition="outside", textfont=dict(size=10, color=SLATE),
-        marker_color=BLUE,
+        marker_color=TEAL,
     ))
     fig_dow.update_layout(
         height=210, margin=CHART_MARGIN, font=CHART_FONT,
@@ -214,7 +233,7 @@ with col_b:
         x=borough_trips["trips"], y=borough_trips["borough"], orientation="h",
         text=borough_trips["pct"].apply(lambda v: f"{v:.1f}%"),
         textposition="outside", textfont=dict(size=10, color=SLATE),
-        marker_color=EMERALD,
+        marker_color=AMBER,
     ))
     fig_boro.update_layout(
         height=210, margin=CHART_MARGIN, font=CHART_FONT,
@@ -271,7 +290,7 @@ fig_fc = go.Figure()
 fig_fc.add_trace(go.Scatter(
     x=zone_fc["date"], y=zone_fc["actual"],
     name="Actual", mode="lines",
-    line=dict(color=BLUE, width=2),
+    line=dict(color=TEAL, width=2),
 ))
 fig_fc.add_trace(go.Scatter(
     x=zone_fc["date"], y=zone_fc["forecast"],

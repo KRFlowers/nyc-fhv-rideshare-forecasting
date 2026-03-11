@@ -24,7 +24,7 @@ The analysis follows a four-stage notebook pipeline.
 3. **Exploratory Analysis** — Examine demand patterns for seasonality, trend, and cross-zone correlation
 4. **Demand Forecasting** — Evaluate three models, select the best performer, scale model across selected zones
 
-The project also includes an interactive Streamlit dashboard showing KPIs, demand charts, and zone-level forecast accuracy (see [below](#streamlit-dashboard)).
+The project also includes two interactive Streamlit applications for visualizing results and exploring the full dataset (see [Interactive Apps](#interactive-apps)).
 
 ---
 
@@ -47,9 +47,13 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 ---
 
-## Streamlit Dashboard
+## Interactive Apps
 
-An interactive dashboard showing KPIs, demand charts, and zone-level forecast accuracy
+Two Streamlit applications provide different views into the dataset — one for communicating forecasting results, one for hands-on data exploration at scale.
+
+### Operations Dashboard
+
+An interactive dashboard showing KPIs, demand charts, and zone-level forecast accuracy.
 
 ![Operations Dashboard](images/dashboard_screenshot.png)
 
@@ -61,15 +65,16 @@ Run locally:
 
     streamlit run app/dashboard.py
 
----
+### SQL Explorer
 
-## SQL Explorer
+An interactive SQL-powered tool for querying all 684 million trip records directly from Parquet via DuckDB.
 
-An interactive SQL-powered data exploration tool for querying all 684 million trip records directly using DuckDB.
+![SQL Explorer](images/explorer_screenshot.png)
 
 - **Browse & Filter** — Explore raw trip records with date, borough, zone, company, and day-of-week filters
-- **Pre-Built Queries** — 16 analytical queries spanning aggregations, window functions, CTEs, JOINs, date/time analysis, and data quality checks — each with a "View SQL" expander showing the exact query
+- **Pre-Built Queries** — 16 analytical queries covering window functions, CTEs, JOINs, and date/time analysis — each with a "View SQL" expander showing the exact query
 - **Custom SQL** — Write and run your own SQL against the full dataset (with a row limit safeguard)
+- **Architecture** — Modular five-file design separating entry point, tab rendering, query definitions, shared utilities, and styling
 
 Run locally:
 
@@ -152,7 +157,7 @@ A detailed analysis report was created that identified the possible enhancements
 - One-day-ahead forecasting evaluated using temporal holdout validation
 - Transformations applied after appropriate temporal separation to prevent leakage
 - Notebook executes fully from top to bottom without hidden state
-- Streamlit dashboard built from saved model outputs
+- Streamlit apps built from saved model outputs and raw Parquet data
 
 ## References
 
