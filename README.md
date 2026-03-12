@@ -2,9 +2,7 @@
 
 ## Project Overview
 
-In the demand-driven rideshare industry, unpredictability creates a constant staffing challenge. Inaccurate demand forecasting results in either **excessive costs** from driver surpluses or **degraded service** from driver shortages. This is where high-accuracy forecasting provides a critical advantage, as it allows operators to maximize efficiency while ensuring workers have **predictable schedules**.
-
-This project demonstrates a solution by forecasting rideshare volume across 195 NYC zones using **684 million trip records**. After evaluating Seasonal Naïve, Prophet, and XGBoost, **XGBoost was the strongest performer**, achieving a **6.4% average MAPE** with 97% of zones meeting the 10% error target.
+This project forecasts daily rideshare volume across 195 NYC zones using 684 million trip records. Three models were evaluated, including a Seasonal Naive Baseline, Prophet and XGBoost. XGBoost proved to be the strongest performer, achieving a 6.4% average MAPE with 97% of zones meeting the 10% error target.
 
 ---
 
@@ -43,13 +41,13 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 - Day-of-week patterns, indicating weekly seasonality, provided the most consistent demand signal
 - Weekend demand was generally higher than weekdays
-- Zones highly correlated with global demand accounted for the majority of total trip volume, supporting a shared modeling approach
+- A majority of zones were highly correlated with global demand, allowing for use of a shared model approach
 
 ---
 
 ## Interactive Apps
 
-Two Streamlit applications provide different views into the dataset — one for communicating forecasting results, one for hands-on data exploration at scale.
+Two Streamlit applications were created to provide different views into the dataset: a dashboard for visualizing forecast results and an SQL browser to assist with data exploration.
 
 ### Operations Dashboard
 
@@ -94,8 +92,6 @@ Run locally:
 
 ## Next Steps
 
-A detailed analysis report was created that identified the possible enhancements below. These were captured in an enhancement roadmap located in [`docs/`](docs/).
-
 - Incorporate time-series cross-validation (rolling/expanding window)
 - Extend forecasting horizon to 7–14 days
 - Re-evaluate Prophet at longer horizons where its decomposition approach may be better suited
@@ -106,6 +102,8 @@ A detailed analysis report was created that identified the possible enhancements
 - Explore hyperparameter optimization
 - Build additional models for outlier zones that show different demand patterns
 - Integrate external demand drivers (weather, events)
+
+These enhancements were identified through an AI-assisted review of the analysis. The full write-up and roadmap are in [`docs/`](docs/).
 
 ---
 
@@ -121,7 +119,7 @@ A detailed analysis report was created that identified the possible enhancements
 
 ## Tech Stack
 
-- DuckDB (large-scale data processing)
+- DuckDB 
 - pandas, NumPy
 - XGBoost
 - Prophet
@@ -146,6 +144,7 @@ A detailed analysis report was created that identified the possible enhancements
 ├── images/                  # README visual assets
 └── requirements.txt         # Pinned dependencies
 ```
+
 ---
 
 ## Reproducibility & Validation
