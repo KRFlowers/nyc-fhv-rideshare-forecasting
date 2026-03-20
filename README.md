@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project forecasts daily rideshare volume across 195 NYC zones using 684 million trip records. Three models were evaluated, including a Seasonal Naive Baseline, Prophet and XGBoost. XGBoost proved to be the strongest performer, achieving a 6.4% average MAPE with 97% of zones meeting the 10% error target.
+This project forecasts daily rideshare volume across 195 NYC zones using 684 million trip records. Three models were evaluated, including a Seasonal Naive Baseline, Prophet and XGBoost. XGBoost was the best performer, achieving a 6.4% average MAPE with 97% of zones meeting the 10% error target.
 
 ---
 
@@ -39,15 +39,15 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 ### Demand Patterns
 
-- Day-of-week patterns, indicating weekly seasonality, provided the most consistent demand signal
+- Day-of-week patterns provided the strongest demand signal
 - Weekend demand was generally higher than weekdays
-- A majority of zones were highly correlated with global demand, allowing for use of a shared model approach
+- A majority of zones were highly correlated with global demand, allowing for use of a shared modeling approach
 
 ---
 
 ## Interactive Apps
 
-Two Streamlit applications were created to provide different views into the dataset: a dashboard for visualizing forecast results and an SQL browser to assist with data exploration.
+The project includes two Streamlit apps: a dashboard for visualizing forecast results and an SQL browser to assist with data exploration.
 
 ### Operations Dashboard
 

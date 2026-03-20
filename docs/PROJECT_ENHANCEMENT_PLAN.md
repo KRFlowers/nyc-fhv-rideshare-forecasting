@@ -33,16 +33,6 @@ These are the 25 enhancements identified in the technical report and future impr
 | R24 | -- | Statistical significance testing (Diebold-Mariano, bootstrap CIs on MAE/MAPE) | Low | Yes | 2 | 24 |
 | R25 | -- | Prediction intervals (quantile regression or conformal prediction) | Medium | Yes | 5 | 25 |
 
-## Future Learning Topics
-
-Areas to study for future projects.
-
-- [ ] **F1:** Time-series cross-validation -- understand expanding vs rolling window tradeoffs for demand data
-- [ ] **F2:** SHAP for time series -- how to interpret feature contributions when features are lagged versions of the target
-- [ ] **F3:** Prophet with regressors -- adding lag features as external regressors to test fair comparison with XGBoost
-- [ ] **F4:** Multi-horizon forecasting -- how lag feature reliability degrades at longer horizons and mitigation strategies
-- [ ] **F5:** Ljung-Box and residual diagnostics -- formal testing for remaining autocorrelation in forecast errors
-
 ---
 
 *Generated: February 2026*
