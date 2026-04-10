@@ -10,6 +10,8 @@ This project forecasts daily rideshare volume across 195 NYC zones using 684 mil
 
 - **Forecast horizon:** This analysis focuses on short-term, one-day-ahead forecasting with the goal to provide an initial benchmark and to validate the data and modeling approach
 - **Zone selection:** Zones with highly correlated demand patterns were selected so a single model could be applied (195 zones were modeled, 82% of total trip volume)
+- **Operator scope:** Demand is analyzed at the zone level, not split by operator (Uber/Lyft)
+
 
 ---
 
@@ -18,8 +20,8 @@ This project forecasts daily rideshare volume across 195 NYC zones using 684 mil
 The analysis follows a four-stage notebook pipeline.
 
 1. **Data Download** — Download and consolidate monthly trip files into a single Parquet dataset
-2. **Data Validation** — Validate trip records against thresholds for duration, distance, and fare
-3. **Exploratory Analysis** — Examine demand patterns for seasonality, trend, and cross-zone correlation
+2. **Data Validation** — Validate trip records against thresholds for trip_time, trip_miles, and base_passenger_fare
+3. **Exploratory Analysis** — Analyze trend, stationarity (ADF, KPSS, ACF), seasonality, and zone-to-global correlation to segment zones for modeling
 4. **Demand Forecasting** — Evaluate three models, select the best performer, scale model across selected zones
 
 The project also includes two interactive Streamlit applications for visualizing results and exploring the full dataset (see [Interactive Apps](#interactive-apps)).
@@ -39,9 +41,9 @@ Model performance was evaluated using mean absolute percentage error (MAPE) for 
 
 ### Demand Patterns
 
-- Day-of-week patterns provided the strongest demand signal
-- Weekend demand was generally higher than weekdays
-- A majority of zones were highly correlated with global demand, allowing for use of a shared modeling approach
+- ACF confirms strong 7-day lag structure as the dominant demand signal
+- Weekend demand was generally higher than weekdays (+13%)
+- A majority of zones were highly correlated with global demand, allowing a shared modeling approach
 
 ---
 
@@ -87,12 +89,12 @@ Run locally:
 - Forecast horizon was limited to one-day-ahead predictions
 - External variables that may affect demand (weather, events, policy changes) were not included
 - Low-correlation zones (airports, entertainment districts) were not included in modeling
+- No statistical outlier detection applied; daily aggregation minimizes impact of individual record anomalies
 
 ---
 
 ## Next Steps
 
-- Incorporate time-series cross-validation (rolling/expanding window)
 - Extend forecasting horizon to 7–14 days
 - Re-evaluate Prophet at longer horizons where its decomposition approach may be better suited
 - Add residual diagnostics (Ljung-Box test, ACF/PACF validation, segmented analysis by borough)
