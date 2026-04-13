@@ -97,12 +97,11 @@ Run locally:
 
 - Extend forecasting horizon to 7–14 days
 - Re-evaluate Prophet at longer horizons where its decomposition approach may be better suited
-- Add residual diagnostics (Ljung-Box test, ACF/PACF validation, segmented analysis by borough)
 - Apply SHAP analysis for zone-level feature interpretation
 - Evaluate additional models (LightGBM, ARIMA/SARIMAX)
 - Add statistical significance testing (Diebold-Mariano, bootstrap CIs)
-- Explore hyperparameter optimization
 - Build additional models for outlier zones that show different demand patterns
+- Reivew and/or segment demand by borough (dashboard filtering indicated possible within burrough trend)
 - Integrate external demand drivers (weather, events)
 
 These enhancements were identified through an AI-assisted review of the analysis. The full write-up and roadmap are in [`docs/`](docs/).

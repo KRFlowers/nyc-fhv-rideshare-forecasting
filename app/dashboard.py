@@ -33,7 +33,7 @@ st.markdown(
     .block-container {padding:0.8rem 1.5rem 0rem 1.5rem; padding-top:2.5rem;}
     h2, h3 {
         margin: 0.4rem 0 0 0;
-        font-size: 0.72rem !important;
+        font-size: 0.85rem !important;
         color: #94A3B8 !important;
         font-weight: 600;
         text-transform: uppercase;
@@ -84,6 +84,9 @@ def load_data():
     """Load all pipeline outputs."""
     zone_daily = pd.read_parquet(DATA_DIR / "processed" / "zone_daily_full.parquet")
     zone_daily["date"] = pd.to_datetime(zone_daily["date"])
+    zone_daily["day_name"] = zone_daily["date"].dt.day_name()
+    zone_daily["year"] = zone_daily["date"].dt.year
+    zone_daily["month"] = zone_daily["date"].dt.month
 
     zone_meta = pd.read_csv(DATA_DIR / "raw" / "zone_metadata.csv")
 
@@ -236,8 +239,8 @@ with col_b:
         marker_color=AMBER,
     ))
     fig_boro.update_layout(
-        height=210, margin=CHART_MARGIN, font=CHART_FONT,
-        xaxis=dict(visible=False),
+        height=210, margin=dict(l=40, r=20, t=5, b=25), font=CHART_FONT,
+        xaxis=dict(visible=False, range=[0, borough_trips["trips"].max() * 1.18]),
         yaxis=dict(tickfont=dict(size=10)),
         plot_bgcolor="white",
     )
@@ -269,7 +272,7 @@ with col_c:
             ticktext=["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
             showgrid=False,
         ),
-        yaxis=dict(tickformat=",.0s", title="", gridcolor="#F1F5F9"),
+        yaxis=dict(tickformat=".2s", title="", gridcolor="#F1F5F9"),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0.5,
                     xanchor="center", font=dict(size=10)),
         plot_bgcolor="white",
