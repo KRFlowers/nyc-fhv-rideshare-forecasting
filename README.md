@@ -101,10 +101,10 @@ Run locally:
 - Evaluate additional models (LightGBM, ARIMA/SARIMAX)
 - Add statistical significance testing (Diebold-Mariano, bootstrap CIs)
 - Build additional models for outlier zones that show different demand patterns
-- Reivew and/or segment demand by borough (dashboard filtering indicated possible within burrough trend)
+- Reivew and/or segment demand by borough (dashboard filtering indicated possible within borough trend)
 - Integrate external demand drivers (weather, events)
 
-These enhancements were identified through an AI-assisted review of the analysis. The full write-up and roadmap are in [`docs/`](docs/).
+These enhancements were originally identified through an AI-assisted review of the analysis. The full initial report and roadmap are in [`docs/`](docs/).
 
 ---
 
@@ -163,5 +163,5 @@ These enhancements were identified through an AI-assisted review of the analysis
 
 - NYC Taxi & Limousine Commission. (n.d.). TLC Trip Record Data. https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 
-**K Flowers**
+**Kristi Flowers**
 GitHub: [KRFlowers](https://github.com/KRFlowers)
